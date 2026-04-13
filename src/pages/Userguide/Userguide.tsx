@@ -63,7 +63,7 @@ const SignInInstructions = () => {
         </div>
         <p>
           Once you&apos;re signed-in to your account you&apos;re set to go. Open
-          the extension pop-up (🍏 icon) to generate a new{' '}
+          the extension pop-up (📧 icon) to generate a new{' '}
           <span className="font-semibold">HideMyEmail</span> address! ✨
         </p>
       </div>
@@ -96,6 +96,20 @@ const SignInInstructions = () => {
           .
         </p>
       </Notice>
+      <Notice title="Privacy note: Advanced Data Protection">
+        <p>
+          If you have Advanced Data Protection enabled, iCloud.com cannot read
+          private data such as photos or contacts without device authorization.
+          The extension is open-source on{' '}
+          <Link
+            href="https://github.com/imNebula/icloud-hide-my-email-browser-extension"
+            aria-label="source code"
+          >
+            GitHub
+          </Link>
+          .
+        </p>
+      </Notice>
     </div>
   );
 };
@@ -121,7 +135,7 @@ const SignInInstructionsZh = () => {
           <img src="./icloud-sign-in.webp" alt="icloud.com 登录流程截图" />
         </div>
         <p>
-          完成登录后即可开始使用。打开扩展弹窗（🍏 图标）即可生成新的{' '}
+          完成登录后即可开始使用。打开扩展弹窗（📧 图标）即可生成新的{' '}
           <span className="font-semibold">HideMyEmail</span> 地址。
         </p>
       </div>
@@ -140,6 +154,19 @@ const SignInInstructionsZh = () => {
         <p>
           不是强制要求。您也可以在登录流程中选择不信任当前浏览器，扩展仍然可以工作。但如果保持登录，扩展也会更稳定地维持登录状态，避免频繁重新登录。因此即使不是必需，仍强烈建议
           <span className="font-semibold">勾选“保持登录状态”</span>。
+        </p>
+      </Notice>
+      <Notice title="隐私提示：高级数据保护">
+        <p>
+          如果您开启了高级数据保护，iCloud.com
+          未经设备授权无法读取相册、通讯录等隐私数据，可放心使用。扩展相关代码已在{' '}
+          <Link
+            href="https://github.com/imNebula/icloud-hide-my-email-browser-extension"
+            aria-label="源码仓库"
+          >
+            GitHub
+          </Link>{' '}
+          开源。
         </p>
       </Notice>
       <Notice title="不要使用 Passkey 登录" isAlert>
@@ -189,7 +216,7 @@ const UsageInstructions = () => {
     <div className="space-y-4">
       <div className="space-y-2">
         <p>
-          In the extension pop-up (🍏 icon) you can find a
+          In the extension pop-up (📧 icon) you can find a
           MacOS-System-Settings-like UI that enables you to generate new
           HideMyEmail addresses and manage existing ones.
         </p>
@@ -237,7 +264,7 @@ const UsageInstructions = () => {
         Don&apos;t forget to delete the HideMyEmail addresses you created above
         for the purposes of trying this out:
         <ol className="list-decimal list-inside">
-          <li>Open the extension pop-up (🍏 icon)</li>
+          <li>Open the extension pop-up (📧 icon)</li>
           <li>Navigate to the &quot;Manage emails&quot; view</li>
           <li>Select, deactivate, and delete the relevant addresses</li>
         </ol>
@@ -251,7 +278,7 @@ const UsageInstructionsZh = () => {
     <div className="space-y-4">
       <div className="space-y-2">
         <p>
-          在扩展弹窗（🍏 图标）中，您可以使用类似 MacOS 系统设置风格的界面来生成新的
+          在扩展弹窗（📧 图标）中，您可以使用类似 MacOS 系统设置风格的界面来生成新的
           HideMyEmail 地址，并管理已有地址。
         </p>
         <p>
@@ -292,7 +319,7 @@ const UsageInstructionsZh = () => {
       <div>
         试用完成后，别忘了清理上面创建的 HideMyEmail 地址：
         <ol className="list-decimal list-inside">
-          <li>打开扩展弹窗（🍏 图标）</li>
+          <li>打开扩展弹窗（📧 图标）</li>
           <li>进入 &quot;Manage emails&quot; 页面</li>
           <li>选择相关地址并执行停用、删除</li>
         </ol>
@@ -339,7 +366,7 @@ const TechnicalOverview = () => {
         </span>
         . The source of the extension is{' '}
         <Link
-          href="https://github.com/dedoussis/icloud-hide-my-email-browser-extension"
+          href="https://github.com/imNebula/icloud-hide-my-email-browser-extension"
           aria-label="source code"
         >
           publicly available in GitHub
@@ -389,7 +416,7 @@ const TechnicalOverviewZh = () => {
         </span>
         。扩展源码已在{' '}
         <Link
-          href="https://github.com/dedoussis/icloud-hide-my-email-browser-extension"
+          href="https://github.com/imNebula/icloud-hide-my-email-browser-extension"
           aria-label="源码仓库"
         >
           GitHub
@@ -404,8 +431,26 @@ const TechnicalOverviewZh = () => {
   );
 };
 
+const getInitialGuideLanguage = (): 'en' | 'zh' => {
+  if (typeof navigator === 'undefined') {
+    return 'en';
+  }
+
+  const candidateLanguages = [
+    ...(navigator.languages || []),
+    navigator.language || '',
+  ];
+
+  const hasChineseLocale = candidateLanguages.some((languageCode) =>
+    languageCode.toLowerCase().startsWith('zh')
+  );
+
+  return hasChineseLocale ? 'zh' : 'en';
+};
+
 const Userguide = () => {
-  const [guideLanguage, setGuideLanguage] = useState<'en' | 'zh'>('en');
+  const [guideLanguage, setGuideLanguage] =
+    useState<'en' | 'zh'>(getInitialGuideLanguage);
   const isZh = guideLanguage === 'zh';
 
   return (

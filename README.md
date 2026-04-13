@@ -1,6 +1,6 @@
 # iCloud Hide My Email Browser Extension
 
-[![Tests Status](https://github.com/dedoussis/icloud-hide-my-email-browser-extension/workflows/tests/badge.svg)](https://github.com/dedoussis/icloud-hide-my-email-browser-extension/actions/workflows/tests.yml)
+[![Tests Status](https://github.com/imNebula/icloud-hide-my-email-browser-extension/workflows/tests/badge.svg)](https://github.com/imNebula/icloud-hide-my-email-browser-extension/actions/workflows/tests.yaml)
 
 [Hide My Email](https://support.apple.com/en-us/HT210425) is a premium privacy service of iCloud. Safari offers a native integration with Hide My Email, whereby users are prompted to generate a Hide My Email address upon registration to any website. This extension aims to bring a similar UX into a wider variety of browsers. In particular, it has been explicitly tested to work on:
 
@@ -12,6 +12,8 @@
 Note that the extension _should_ work on any browser that implements the [extension API](https://developer.chrome.com/docs/extensions/reference/) supported by Chromium-based browsers.
 
 _Disclaimer: This extension is not endorsed by, directly affiliated with, maintained, authorized, or sponsored by Apple._
+
+_Attribution: The original project was created by Dimitrios Dedoussis._
 
 <p align="center">
 <img src="./src/assets/img/demo-popup.gif" alt="Extension popup demo" width="400" height="auto"/>

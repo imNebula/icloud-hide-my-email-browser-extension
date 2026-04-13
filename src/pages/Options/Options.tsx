@@ -136,15 +136,16 @@ const Disclaimer = () => {
         此扩展程序由第三方独立开发，并非由 Apple 赞助、授权或直接关联。
       </p>
       <p>
-        它由{' '}
-        <Link href="https://twitter.com/dedoussis">Dimitrios Dedoussis</Link> 独立开发。
+        原始项目由{' '}
+        <Link href="https://twitter.com/dedoussis">Dimitrios Dedoussis</Link>{' '}
+        独立开发。
       </p>
       <p>
-        你可以前往{' '}
-        <Link href="https://github.com/dedoussis/icloud-hide-my-email-browser-extension">
+        当前维护仓库请前往{' '}
+        <Link href="https://github.com/imNebula/icloud-hide-my-email-browser-extension">
           GitHub
         </Link>{' '}
-        获取其开源代码。
+        查看开源代码。
       </p>
       <p>
         本扩展本身也遵循同样的 MIT 协议开源。

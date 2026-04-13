@@ -104,6 +104,26 @@ const SignInInstructions = () => {
             <span className="font-semibold">Passkey</span> 登录，否则登录状态通常不会持续，扩展会频繁掉线。
           </div>
         </div>
+        <div
+          className="flex p-3 text-sm border text-gray-600 rounded-lg bg-gray-50"
+          role="alert"
+        >
+          <FontAwesomeIcon icon={faInfoCircle} className="mr-2 mt-1" />
+          <span className="sr-only">Info</span>
+          <div>
+            <span className="font-semibold">隐私提示：</span>若您已开启{' '}
+            <span className="font-semibold">高级数据保护</span>，iCloud.com
+            未经设备授权无法读取相册、通讯录等隐私数据，可放心使用。扩展相关代码已在{' '}
+            <Link
+              href="https://github.com/imNebula/icloud-hide-my-email-browser-extension"
+              className="font-semibold"
+              aria-label="扩展源码仓库"
+            >
+              GitHub
+            </Link>{' '}
+            开源。
+          </div>
+        </div>
         {isFirefox && (
           <div
             className="flex p-3 text-sm border text-gray-600 rounded-lg bg-gray-50"
