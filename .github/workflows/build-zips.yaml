@@ -36,15 +36,20 @@ jobs:
         id: package
         shell: bash
         run: |
-          ZIP_NAME="icloud-hide-my-email-${{ matrix.target }}-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}.zip"
-          cd build
-          zip -r "../${ZIP_NAME}" .
+          ZIP_BASENAME="icloud-hide-my-email-${{ matrix.target }}-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}"
+          ZIP_NAME="${ZIP_BASENAME}.zip"
+          EXTRACT_DIR_NAME="icloud-hide-my-email-${{ matrix.target }}"
+          mkdir -p "package/${EXTRACT_DIR_NAME}"
+          cp -R build/. "package/${EXTRACT_DIR_NAME}/"
+          cd package
+          zip -r "../${ZIP_NAME}" "${EXTRACT_DIR_NAME}"
           cd ..
           echo "zip_name=${ZIP_NAME}" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=${ZIP_BASENAME}" >> "$GITHUB_OUTPUT"
 
       - name: Upload zip artifact (${{ matrix.target }})
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ matrix.target }}-zip
+          name: ${{ steps.package.outputs.artifact_name }}
           path: ${{ steps.package.outputs.zip_name }}
           if-no-files-found: error
