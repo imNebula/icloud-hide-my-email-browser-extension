@@ -14,7 +14,7 @@ import isEqual from 'lodash.isequal';
 import { DEFAULT_STORE } from '../../storage';
 
 const SELECT_FWD_TO_SIGNED_OUT_CTA_COPY =
-  'To select a new Forward-To address, you first need to sign-in by following the instructions on the extension pop-up.';
+  '要选择新的转发邮箱，请先点击扩展图标并按照引导登录您的 iCloud 账号。';
 
 const SelectFwdToForm = () => {
   const [selectedFwdToEmail, setSelectedFwdToEmail] = useState<string>();
@@ -89,7 +89,7 @@ const SelectFwdToForm = () => {
         setUpdateFwdToError(e.toString());
       }
     } else {
-      setUpdateFwdToError('No Forward To address has been selected.');
+      setUpdateFwdToError('未选择任何转发邮箱地址。');
     }
     setIsSubmitting(false);
   };
@@ -123,7 +123,7 @@ const SelectFwdToForm = () => {
           </label>
         </div>
       ))}
-      <LoadingButton loading={isSubmitting}>Update</LoadingButton>
+      <LoadingButton loading={isSubmitting}>保存更新</LoadingButton>
       {updateFwdToError && <ErrorMessage>{updateFwdToError}</ErrorMessage>}
     </form>
   );
@@ -133,23 +133,21 @@ const Disclaimer = () => {
   return (
     <div>
       <p>
-        This extension is not endorsed by, directly affiliated with, maintained,
-        authorized, or sponsored by Apple.
+        此扩展程序由第三方独立开发，并非由 Apple 赞助、授权或直接关联。
       </p>
       <p>
-        It is developed independently by{' '}
-        <Link href="https://twitter.com/dedoussis">Dimitrios Dedoussis</Link>.
+        它由{' '}
+        <Link href="https://twitter.com/dedoussis">Dimitrios Dedoussis</Link> 独立开发。
       </p>
       <p>
-        The source code is publicly available at{' '}
+        你可以前往{' '}
         <Link href="https://github.com/dedoussis/icloud-hide-my-email-browser-extension">
           GitHub
         </Link>{' '}
-        under the MIT license.
+        获取其开源代码。
       </p>
       <p>
-        The extension itself is licensed under the same license as the source
-        code.
+        本扩展本身也遵循同样的 MIT 协议开源。
       </p>
     </div>
   );
@@ -193,17 +191,17 @@ const AutofillForm = () => {
 const Options = () => {
   return (
     <div className="w-9/12 m-auto my-3">
-      <TitledComponent title="Hide My Email" subtitle="Settings">
+      <TitledComponent title="Hide My Email" subtitle="扩展设置">
         <div>
-          <h3 className="font-bold text-lg mb-3">Disclaimer</h3>
+          <h3 className="font-bold text-lg mb-3">免责声明</h3>
           <Disclaimer />
         </div>
         <div>
-          <h3 className="font-bold text-lg mb-3">Forward To Address</h3>
+          <h3 className="font-bold text-lg mb-3">邮件转发至以下地址</h3>
           <SelectFwdToForm />
         </div>
         <div>
-          <h3 className="font-bold text-lg mb-3">Autofill</h3>
+          <h3 className="font-bold text-lg mb-3">保留地址并自动填充</h3>
           <AutofillForm />
         </div>
       </TitledComponent>

@@ -1,15 +1,32 @@
 import React, { ButtonHTMLAttributes, DetailedHTMLProps } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+
+const RingSpinner = (props: {
+  size: number;
+  borderWidth: number;
+  className?: string;
+}) => {
+  const { size, borderWidth, className } = props;
+
+  return (
+    <span
+      className={`inline-block animate-spin rounded-full ${className || ''}`}
+      style={{
+        width: size,
+        height: size,
+        borderStyle: 'solid',
+        borderWidth,
+        borderColor: 'rgba(11, 87, 208, 0.2)',
+        borderTopColor: '#0b57d0',
+      }}
+      aria-hidden="true"
+    />
+  );
+};
 
 export const Spinner = () => {
   return (
     <div className="text-center">
-      <FontAwesomeIcon
-        icon={faSpinner}
-        spin={true}
-        className="text-3xl text-sky-400"
-      />
+      <RingSpinner size={34} borderWidth={3} />
     </div>
   );
 };
@@ -25,10 +42,10 @@ export const LoadingButton = (
   const { loading, disabled, ...btnHtmlAttrs } = props;
 
   const defaultClassName =
-    'w-full justify-center text-white bg-sky-400 hover:bg-sky-500 focus:ring-4 focus:outline-hidden focus:ring-blue-300 font-medium rounded-lg px-5 py-2.5 text-center mr-2 inline-flex items-center';
+    'w-full justify-center text-gray-800 bg-white border border-gray-200 hover:bg-gray-50 hover:-translate-y-0.5 focus:ring-4 focus:outline-hidden focus:ring-gray-100 font-bold rounded-full px-5 py-2.5 text-center mr-2 inline-flex items-center transition-all shadow-[0_4px_16px_rgba(0,0,0,0.06)]';
 
   const diabledClassName =
-    'w-full justify-center text-white bg-gray-400 font-medium rounded-lg px-5 py-2.5 text-center mr-2 inline-flex items-center';
+    'w-full justify-center text-gray-400 bg-gray-50 border border-gray-100 font-bold rounded-full px-5 py-2.5 text-center mr-2 inline-flex items-center';
 
   const btnClassName = disabled ? diabledClassName : defaultClassName;
 
@@ -40,7 +57,7 @@ export const LoadingButton = (
       {...btnHtmlAttrs}
     >
       {loading && !disabled && (
-        <FontAwesomeIcon icon={faSpinner} spin={true} className="mr-1" />
+        <RingSpinner size={16} borderWidth={2} className="mr-1" />
       )}
       {props.children}
     </button>
@@ -69,7 +86,7 @@ export const TitledComponent = (props: {
   return (
     <div className="text-base space-y-3">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-gray-900">{props.title}</h1>
+        <h1 className="text-2xl font-bold text-gray-900">{props.title}</h1>
         <h2 className="font-medium text-gray-400">{props.subtitle}</h2>
       </div>
       {children?.map((child, key) => {
@@ -97,7 +114,7 @@ export const Link = (
   const { className, children, ...restProps } = props;
   return (
     <a
-      className={`text-sky-400 hover:text-sky-500 ${className}`}
+      className={`text-blue-600 hover:text-blue-700 ${className}`}
       target="_blank"
       rel="noreferrer"
       {...restProps}

@@ -14,7 +14,9 @@ import { getBrowserStorageValue } from '../../storage';
 const EMAIL_INPUT_QUERY_STRING =
   'input[type="email"], input[name="email"], input[id="email"]';
 
-const LOADING_COPY = 'Hide My Email — Loading...';
+const LEGACY_HME_BUTTON_SELECTOR = '.hme-autofill-btn';
+
+const LOADING_COPY = '隐藏我的邮箱 — 等待生成中...';
 
 // A unique CSS class prefix is used to guarantee that the style injected
 // by the extension does not interfere with the existing style of
@@ -34,14 +36,52 @@ type AutofillableInputElement = {
   };
 };
 
+const hideLegacyHmeButtonElement = (el: HTMLElement): void => {
+  el.style.setProperty('display', 'none', 'important');
+  el.style.setProperty('visibility', 'hidden', 'important');
+  el.style.setProperty('pointer-events', 'none', 'important');
+};
+
+const escapeForAttributeSelector = (value: string): string => {
+  if (typeof CSS !== 'undefined' && typeof CSS.escape === 'function') {
+    return CSS.escape(value);
+  }
+  return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"');
+};
+
+const hideLegacyHmeButtonsForInput = (inputElement: HTMLInputElement): void => {
+  const legacyId = inputElement.getAttribute('data-hme-id');
+  if (!legacyId) {
+    return;
+  }
+
+  const selector = `${LEGACY_HME_BUTTON_SELECTOR}[data-hme-for="${escapeForAttributeSelector(
+    legacyId
+  )}"]`;
+  document.querySelectorAll<HTMLElement>(selector).forEach((el) => {
+    hideLegacyHmeButtonElement(el);
+  });
+};
+
+const hideLegacyHmeButtons = (root: ParentNode = document): void => {
+  root.querySelectorAll<HTMLElement>(LEGACY_HME_BUTTON_SELECTOR).forEach((el) => {
+    hideLegacyHmeButtonElement(el);
+  });
+};
+
 const disableButton = (
   btn: HTMLButtonElement,
   cursorClass: string,
-  copy: string
+  copy?: string
 ): void => {
-  btn.innerHTML = copy;
+  if (copy && copy !== LOADING_COPY && !copy.includes('等待')) {
+    btn.setAttribute('data-tooltip', copy);
+    btn.setAttribute('data-show-tooltip', 'true');
+    setTimeout(() => btn.removeAttribute('data-show-tooltip'), 3500); // 错误提示展示 3.5秒
+  } else {
+    btn.removeAttribute('data-tooltip');
+  }
   btn.setAttribute('disabled', 'true');
-  btn.classList.remove(className('hover-button'));
   btn.classList.forEach((name) => {
     if (name.startsWith(className('cursor-'))) {
       btn.classList.remove(name);
@@ -55,9 +95,9 @@ const enableButton = (
   cursorClass: string,
   copy: string
 ): void => {
-  btn.innerHTML = copy;
+  btn.setAttribute('data-tooltip', '点击填充: ' + copy);
+  btn.dataset.hme = copy;
   btn.removeAttribute('disabled');
-  btn.classList.add(className('hover-button'));
   btn.classList.forEach((name) => {
     if (name.startsWith(className('cursor-'))) {
       btn.classList.remove(name);
@@ -77,9 +117,32 @@ const makeButtonSupport = (
 
   disableButton(btnElement, 'cursor-not-allowed', LOADING_COPY);
 
+  const updatePos = () => {
+    if (!inputElement.isConnected) {
+      clearInterval((btnElement as any)._posInterval);
+      btnElement.remove();
+      return;
+    }
+    const rect = inputElement.getBoundingClientRect();
+    // 隐藏宽或高极小（或不可见）的蜜罐输入框的图标
+    if (rect.width < 30 || rect.height < 10 || window.getComputedStyle(inputElement).display === 'none' || window.getComputedStyle(inputElement).visibility === 'hidden') {
+      btnElement.style.setProperty('display', 'none', 'important');
+    } else {
+      btnElement.style.setProperty('display', 'flex', 'important');
+      btnElement.style.top = `${rect.top + (rect.height - 28) / 2}px`;
+      btnElement.style.left = `${rect.right - 34}px`;
+    }
+  };
+
   const inputOnFocusCallback = async () => {
+    hideLegacyHmeButtonsForInput(inputElement);
     disableButton(btnElement, 'cursor-progress', LOADING_COPY);
-    inputElement.parentNode?.insertBefore(btnElement, inputElement.nextSibling);
+    if (!btnElement.parentNode) {
+      document.body.appendChild(btnElement);
+    }
+    updatePos();
+    clearInterval((btnElement as any)._posInterval);
+    (btnElement as any)._posInterval = window.setInterval(updatePos, 50);
 
     await browser.runtime.sendMessage({
       type: MessageType.GenerateRequest,
@@ -90,15 +153,22 @@ const makeButtonSupport = (
   inputElement.addEventListener('focus', inputOnFocusCallback);
 
   const inputOnBlurCallback = () => {
-    disableButton(btnElement, 'cursor-not-allowed', LOADING_COPY);
-    btnElement.remove();
+    setTimeout(() => {
+      // Allow mousedown to preventDefault and keep focus
+      if (document.activeElement !== inputElement) {
+        clearInterval((btnElement as any)._posInterval);
+        btnElement.remove();
+        disableButton(btnElement, 'cursor-not-allowed', LOADING_COPY);
+      }
+    }, 150);
   };
 
   inputElement.addEventListener('blur', inputOnBlurCallback);
 
   const btnOnMousedownCallback = async (ev: MouseEvent) => {
-    ev.preventDefault();
-    const hme = btnElement.innerHTML;
+    ev.preventDefault(); // Prevents input from losing focus!
+    const hme = btnElement.dataset.hme;
+    if (!hme) return;
     disableButton(btnElement, 'cursor-progress', LOADING_COPY);
     await browser.runtime.sendMessage({
       type: MessageType.ReservationRequest,
@@ -122,12 +192,15 @@ const removeButtonSupport = (
 ): void => {
   const { btnElement, inputOnFocusCallback, inputOnBlurCallback } =
     buttonSupport;
+  clearInterval((btnElement as any)._posInterval);
   inputElement.removeEventListener('focus', inputOnFocusCallback);
   inputElement.removeEventListener('blur', inputOnBlurCallback);
   btnElement.remove();
 };
 
 export default async function main(): Promise<void> {
+  hideLegacyHmeButtons();
+
   const emailInputElements = document.querySelectorAll<HTMLInputElement>(
     EMAIL_INPUT_QUERY_STRING
   );
@@ -155,12 +228,21 @@ export default async function main(): Promise<void> {
           return;
         }
 
+        if (
+          node instanceof HTMLElement &&
+          node.matches(LEGACY_HME_BUTTON_SELECTOR)
+        ) {
+          hideLegacyHmeButtonElement(node);
+        }
+        hideLegacyHmeButtons(node);
+
         const addedElements = node.querySelectorAll<HTMLInputElement>(
           EMAIL_INPUT_QUERY_STRING
         );
         addedElements.forEach((el) => {
+          hideLegacyHmeButtonsForInput(el);
           const elementExists = autofillableInputElements.some((item) =>
-            el.isEqualNode(item.inputElement)
+            el === item.inputElement
           );
           if (!elementExists) {
             autofillableInputElements.push(makeAutofillableInputElement(el));
@@ -178,7 +260,7 @@ export default async function main(): Promise<void> {
         );
         removedElements.forEach((el) => {
           const foundIndex = autofillableInputElements.findIndex((item) =>
-            el.isEqualNode(item.inputElement)
+            el === item.inputElement
           );
           if (foundIndex !== -1) {
             const [{ inputElement, buttonSupport }] =

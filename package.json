@@ -9,6 +9,7 @@
     "url": "https://github.com/dedoussis/icloud-hide-my-email-browser-extension.git"
   },
   "scripts": {
+    "b": "npm run build",
     "prebuild": "rm -rf build",
     "build": "node utils/build.js",
     "prebuild:firefox": "rm -rf build",
