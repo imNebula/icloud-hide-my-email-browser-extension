@@ -36,7 +36,7 @@ jobs:
         id: package
         shell: bash
         run: |
-          ZIP_NAME="icloud-hide-my-email-${{ matrix.target }}-${GITHUB_SHA::7}.zip"
+          ZIP_NAME="icloud-hide-my-email-${{ matrix.target }}-build${GITHUB_RUN_NUMBER}-${GITHUB_SHA::7}.zip"
           cd build
           zip -r "../${ZIP_NAME}" .
           cd ..
