@@ -93,6 +93,17 @@ const SignInInstructions = () => {
             <span className="font-semibold">保持登录状态</span> 以防扩展掉线。
           </div>
         </div>
+        <div
+          className="flex p-3 text-sm border border-amber-200 text-amber-800 rounded-lg bg-amber-50"
+          role="alert"
+        >
+          <FontAwesomeIcon icon={faBan} className="mr-2 mt-1" />
+          <span className="sr-only">Warning</span>
+          <div>
+            <span className="font-semibold">注意：</span>请不要使用{' '}
+            <span className="font-semibold">Passkey</span> 登录，否则登录状态通常不会持续，扩展会频繁掉线。
+          </div>
+        </div>
         {isFirefox && (
           <div
             className="flex p-3 text-sm border text-gray-600 rounded-lg bg-gray-50"

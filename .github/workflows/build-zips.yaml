@@ -1,0 +1,50 @@
+name: build-zips
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  package:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: chromium
+            build_cmd: npm run build
+          - target: firefox
+            build_cmd: npm run build:firefox
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Use Node.js 25.x
+        uses: actions/setup-node@v6
+        with:
+          node-version: 25
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build extension (${{ matrix.target }})
+        run: ${{ matrix.build_cmd }}
+
+      - name: Create zip (${{ matrix.target }})
+        id: package
+        shell: bash
+        run: |
+          ZIP_NAME="icloud-hide-my-email-${{ matrix.target }}-${GITHUB_SHA::7}.zip"
+          cd build
+          zip -r "../${ZIP_NAME}" .
+          cd ..
+          echo "zip_name=${ZIP_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload zip artifact (${{ matrix.target }})
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}-zip
+          path: ${{ steps.package.outputs.zip_name }}
+          if-no-files-found: error
